@@ -1,0 +1,1 @@
+Bugun bu projeyi neden yaptigimi ve hangi problemi cozmek istedigini netlestirdim. 09.01.26 (yuh ne ara) 
