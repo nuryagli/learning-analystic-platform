@@ -64,6 +64,10 @@ def find_topic_weakness(quiz_results):
 
     return topic_averages
 
+    # Not:
+    # Topic weakness olcumunu ortalama ile yaptik.
+    # İleride median / dusuk skor orani gibi metriklerle daha saglam hale getirilebilir.
+
 
 def calculate_progress_trend(quiz_results):
     """
