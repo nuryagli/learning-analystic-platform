@@ -174,8 +174,7 @@ if __name__ == "__main__":
     # Trend'i görünür yapmak için öğrenci 1 - Loops'a 2 yeni kayıt ekleyelim
     quiz_results.append({"student_id": 1, "created_at": "2026-01-15T14:00:00", "score": 88, "topic": "Loops"})
     quiz_results.append({"student_id": 1, "created_at": "2026-01-15T15:00:00", "score": 92, "topic": "Loops"})
-
-    # Senin yazdigin test cagrilarini tek yerde topladik:
+    
     print(calculate_average_score(quiz_results))
     print(find_topic_weakness(quiz_results))
 
