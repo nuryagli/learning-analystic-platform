@@ -1,17 +1,25 @@
+from datetime import datetime
+
+def parse_dt(dt_str: str) -> datetime:
+    return datetime.fromisoformat(dt_str)
+
+
 # Bu dosya egitim verilerinden ogrenme metrikleri cikarmak icin var
 quiz_results = [
-    {"student_id": 1, "attempt":1, "score": 80, "topic": "Loops"},
-    {"student_id": 1, "attempt":2, "score": 75, "topic": "Functions"},
-    {"student_id": 1, "attempt":3, "score": 90, "topic": "Lists"},
+    {"student_id": 1, "created_at": "2026-01-15T10:00:00", "score": 80, "topic": "Loops"},
+    {"student_id": 1, "created_at": "2026-01-15T11:00:00", "score": 75, "topic": "Functions"},
+    {"student_id": 1, "created_at": "2026-01-15T12:00:00", "score": 90, "topic": "Lists"},
 
-    {"student_id": 2, "attempt":1, "score": 85, "topic": "Loops"},
-    {"student_id": 2, "attempt":2, "score": 70, "topic": "Functions"},
-    {"student_id": 2, "attempt":3, "score": 95, "topic": "Lists"},
+    {"student_id": 2, "created_at": "2026-01-15T11:00:00", "score": 85, "topic": "Loops"},
+    {"student_id": 2, "created_at": "2026-01-15T12:00:00", "score": 70, "topic": "Functions"},
+    {"student_id": 2, "created_at": "2026-01-15T13:00:00", "score": 95, "topic": "Lists"},
 
-    {"student_id": 3, "attempt":1, "score": 78, "topic": "Loops"},
-    {"student_id": 3, "attempt":2, "score": 82, "topic": "Functions"},
-    {"student_id": 3, "attempt":3, "score": 92, "topic": "Lists"}
+    {"student_id": 3, "created_at": "2026-02-15T11:00:00", "score": 78, "topic": "Loops"},
+    {"student_id": 3, "created_at": "2026-02-15T12:00:00", "score": 82, "topic": "Functions"},
+    {"student_id": 3, "created_at": "2026-02-15T13:00:00", "score": 92, "topic": "Lists"},
 ]
+
+
 def calculate_average_score(quiz_results):
     """
     Amac: Ogrencilerin genel basari seviyesini olcmek.
@@ -24,14 +32,13 @@ def calculate_average_score(quiz_results):
         if student_id not in student_scores:
             student_scores[student_id] = []
         student_scores[student_id].append(result["score"])
-    
+
     # Her ogrencinin ortalamasini hesapla
     student_averages = [sum(scores) / len(scores) for scores in student_scores.values()]
-    
+
     # Genel ortalamayi hesapla
     average_score = sum(student_averages) / len(student_averages)
     return average_score
-print(calculate_average_score(quiz_results))
 
 
 def find_topic_weakness(quiz_results):
@@ -40,13 +47,12 @@ def find_topic_weakness(quiz_results):
     Tanim:
     Konu ortalamasi ne kadar dusuk ise o konuda zayiflik var.
 
-    Donen deger: 
+    Donen deger:
     [("topic", average_score), ......] en zayiftan en gucluye sirali liste
     """
     topic_scores = {}
 
-    #Topic bazinda skorlari grupla 
-
+    # Topic bazinda skorlari grupla
     for result in quiz_results:
         topic = result["topic"]
         score = result["score"]
@@ -61,7 +67,7 @@ def find_topic_weakness(quiz_results):
         avg = sum(scores) / len(scores)
         topic_averages.append((topic, avg))
 
-    # En zayiftan en gucluya sirala
+    # En zayiftan en gucluye sirala
     topic_averages.sort(key=lambda x: x[1])
 
     return topic_averages
@@ -83,15 +89,16 @@ def calculate_topic_progress_trend(quiz_results):
         grouped.setdefault(sid, {})
         grouped[sid].setdefault(topic, [])
         grouped[sid][topic].append(r)
-    
+
     trends = {}
 
-    # 2) Her ogrenci ve topic icin attempt'e gore sirala, start/end cikar
+    # 2) Her ogrenci ve topic icin created_at'e gore sirala, start/end cikar
     for sid, topics_dict in grouped.items():
         trends[sid] = {}
 
         for topic, records in topics_dict.items():
-            records_sorted = sorted(records, key=lambda x: x["attempt"])
+            records_sorted = sorted(records, key=lambda x: parse_dt(x["created_at"]))
+
             start = records_sorted[0]["score"]
             end = records_sorted[-1]["score"]
 
@@ -104,15 +111,48 @@ def calculate_topic_progress_trend(quiz_results):
     return trends
 
 
+def print_summary_report(quiz_results):
+    avg = calculate_average_score(quiz_results)
+    weaknesses = find_topic_weakness(quiz_results)
+    trends = calculate_topic_progress_trend(quiz_results)
 
-print(find_topic_weakness(quiz_results))
-grouped = calculate_topic_progress_trend(quiz_results)
-print(grouped[1].keys())
+    print("\n" + "=" * 40)
+    print("LEARNING ANALYTICS SUMMARY REPORT")
+    print("=" * 40)
 
-topic_trends = calculate_topic_progress_trend(quiz_results)
-print(topic_trends)
+    print(f"\nClass average score (student-weighted): {avg:.2f}")
+
+    print("\nWeak topics (low -> high):")
+    for topic, score in weaknesses:
+        print(f"  - {topic}: {score:.2f}")
+
+    print("\nTopic trends by student (showing non-zero deltas):")
+    any_change = False
+    for sid, topics in trends.items():
+        for topic, t in topics.items():
+            if t["delta"] != 0:
+                any_change = True
+                print(f"  - Student {sid} | {topic}: start={t['start']} end={t['end']} delta={t['delta']}")
+
+    if not any_change:
+        print("  (No trend changes yet — need multiple records per topic.)")
+
+    print("\nTip: To see trend, add more records for the SAME student + SAME topic over time.")
+    print("=" * 40 + "\n")
 
 
-quiz_results.append({"student_id": 1, "attempt": 4, "score": 88, "topic": "Loops"})
-quiz_results.append({"student_id": 1, "attempt": 5, "score": 92, "topic": "Loops"})
-print(calculate_topic_progress_trend(quiz_results)[1]["Loops"])
+if __name__ == "__main__":
+    # Trend'i görünür yapmak için öğrenci 1 - Loops'a 2 yeni kayıt ekleyelim
+    quiz_results.append({"student_id": 1, "created_at": "2026-01-15T14:00:00", "score": 88, "topic": "Loops"})
+    quiz_results.append({"student_id": 1, "created_at": "2026-01-15T15:00:00", "score": 92, "topic": "Loops"})
+
+    # Senin yazdigin test cagrilarini tek yerde topladik:
+    print(calculate_average_score(quiz_results))
+    print(find_topic_weakness(quiz_results))
+
+    topic_trends = calculate_topic_progress_trend(quiz_results)
+    print(topic_trends)
+    print(topic_trends[1]["Loops"])
+
+    # Daha okunakli rapor:
+    print_summary_report(quiz_results)
