@@ -1,0 +1,70 @@
+{
+  "class_average_score": 84.11,
+  "weak_topics": [
+    {
+      "topic": "Functions",
+      "avg_score": 75.67
+    },
+    {
+      "topic": "Loops",
+      "avg_score": 84.6
+    },
+    {
+      "topic": "Lists",
+      "avg_score": 92.33
+    }
+  ],
+  "topic_trends": {
+    "1": {
+      "Loops": {
+        "start": 80,
+        "end": 92,
+        "delta": 12
+      },
+      "Functions": {
+        "start": 75,
+        "end": 75,
+        "delta": 0
+      },
+      "Lists": {
+        "start": 90,
+        "end": 90,
+        "delta": 0
+      }
+    },
+    "2": {
+      "Loops": {
+        "start": 85,
+        "end": 85,
+        "delta": 0
+      },
+      "Functions": {
+        "start": 70,
+        "end": 70,
+        "delta": 0
+      },
+      "Lists": {
+        "start": 95,
+        "end": 95,
+        "delta": 0
+      }
+    },
+    "3": {
+      "Loops": {
+        "start": 78,
+        "end": 78,
+        "delta": 0
+      },
+      "Functions": {
+        "start": 82,
+        "end": 82,
+        "delta": 0
+      },
+      "Lists": {
+        "start": 92,
+        "end": 92,
+        "delta": 0
+      }
+    }
+  }
+}

@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 def parse_dt(dt_str: str) -> datetime:
@@ -110,6 +111,34 @@ def calculate_topic_progress_trend(quiz_results):
 
     return trends
 
+def generate_summary_report(quiz_results):
+    """
+    Amac: Hesaplanan metrikleri tek bir rapor objesinde toplamak.
+    Not: Bu fonksiyon print etmez; veri döndürür. (API/JSON için ideal)
+    """
+    avg = calculate_average_score(quiz_results)
+    weaknesses = find_topic_weakness(quiz_results)
+    trends = calculate_topic_progress_trend(quiz_results)
+
+    # weaknesses tuple list -> dict list
+    weaknesses_json = [{"topic": topic, "avg_score": round(score, 2)} for topic, score in weaknesses]
+
+    # trends dict zaten JSON'a uygun ama değerleri netleştirelim
+    return {
+        "class_average_score": round(avg, 2),
+        "weak_topics": weaknesses_json,
+        "topic_trends": trends
+    }
+
+def save_report_to_json(report, filepath="report.json"):
+    """
+    Amac: Raporu JSON dosyasi olarak kaydetmek.
+    ensure_ascii=False -> Türkçe karakterleri bozmadan yazar.
+    indent=2 -> okunabilir format.
+    """
+    with open(filepath, "w", encoding="utf-8") as f:
+        json.dump(report, f, ensure_ascii=False, indent=2)
+
 
 def print_summary_report(quiz_results):
     avg = calculate_average_score(quiz_results)
@@ -153,6 +182,10 @@ if __name__ == "__main__":
     topic_trends = calculate_topic_progress_trend(quiz_results)
     print(topic_trends)
     print(topic_trends[1]["Loops"])
+
+    report = generate_summary_report(quiz_results)
+    save_report_to_json(report)
+    print("Saved report to report.json")
 
     # Daha okunakli rapor:
     print_summary_report(quiz_results)
